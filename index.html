@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GOLAZO AI — Inteligencia en Apuestas de Fútbol</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══ PALETA DE 4 COLORES ═══ */
+:root {
+  --bg: #080B0F;
+  --acc: #00E676;
+  --text: #F0F4F8;
+  --muted: #8A9BB0;
+  --font-d: 'Playfair Display', Georgia, serif;
+  --font-b: 'DM Sans', system-ui, sans-serif;
+  --font-m: 'DM Mono', monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: var(--font-b);
+  font-size: 16px; line-height: 1.7; overflow-x: hidden; }
+::selection { background: var(--acc); color: var(--bg); }
+.mono { font-family: var(--font-m); }
+h1, h2, h3 { font-family: var(--font-d); line-height: 1.15; }
+h1 { font-size: clamp(2.8rem, 7vw, 5.5rem); font-weight: 900; }
+h2 { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 700; }
+h3 { font-size: 1.3rem; font-weight: 400; }
+a { color: inherit; text-decoration: none; }
+.container { max-width: 1200px; margin: 0 auto; padding: 0 clamp(1rem, 5vw, 3rem); }
+section { position: relative; z-index: 1; }
+
+/* ═══ TEXTURA DE FONDO ═══ */
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+}
+
+/* ═══ NAV ═══ */
+nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 1.1rem 0;
+  background: rgba(8,11,15,0.85); backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(0,230,118,0.1); }
+.nav-inner { display: flex; align-items: center; justify-content: space-between;
+  max-width: 1200px; margin: 0 auto; padding: 0 clamp(1rem, 5vw, 3rem); }
+.logo { display: flex; align-items: center; gap: 10px; font-family: var(--font-d);
+  font-size: 1.5rem; font-weight: 900; color: var(--acc); letter-spacing: -0.02em; }
+.logo svg { width: 32px; height: 32px; }
+.logo span { color: var(--text); }
+.nav-links { display: flex; gap: 2rem; list-style: none; }
+.nav-links a { color: var(--muted); font-size: 0.8rem; letter-spacing: 0.05em;
+  text-transform: uppercase; transition: color 0.2s; }
+.nav-links a:hover { color: var(--acc); }
+.nav-cta { background: var(--acc); color: var(--bg); border: none;
+  padding: 0.7rem 1.5rem; font-family: var(--font-b); font-weight: 500;
+  font-size: 0.85rem; cursor: pointer; letter-spacing: 0.02em;
+  transition: all 0.2s; }
+.nav-cta:hover { background: var(--text); }
+
+/* ═══ HERO con foto de estadio ═══ */
+.hero { min-height: 100vh; display: flex; flex-direction: column;
+  justify-content: center; padding: 8rem 0 5rem; position: relative; overflow: hidden; }
+.hero-bg { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
+.hero-bg img { width: 100%; height: 100%; object-fit: cover;
+  opacity: 0.15; filter: contrast(1.1) brightness(0.4); }
+.hero-bg::after { content: ''; position: absolute; inset: 0;
+  background: linear-gradient(to bottom, rgba(8,11,15,0.85) 0%,
+    rgba(8,11,15,0.6) 40%, rgba(8,11,15,0.95) 100%); }
+.hero .container { position: relative; z-index: 2; }
+.hero-eyebrow { position: relative; z-index: 2;
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--font-m); font-size: 0.8rem; color: var(--acc);
+  letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 1.5rem; }
+.hero-eyebrow::before { content: ''; display: inline-block; width: 32px;
+  height: 1px; background: var(--acc); }
+.hero-title { position: relative; z-index: 2; margin-bottom: 1.5rem; max-width: 820px; }
+.hero-title em { font-style: italic; color: var(--acc); }
+.hero-subtitle { position: relative; z-index: 2;
+  font-size: 1.15rem; color: var(--muted); max-width: 560px;
+  margin-bottom: 3rem; line-height: 1.75; }
+.hero-actions { position: relative; z-index: 2;
+  display: flex; gap: 1rem; flex-wrap: wrap; }
+.btn-primary { background: var(--acc); color: var(--bg); border: none;
+  padding: 1rem 2.5rem; font-family: var(--font-b); font-weight: 500;
+  font-size: 1rem; cursor: pointer; transition: all 0.2s; display: inline-flex;
+  align-items: center; gap: 8px; }
+.btn-primary:hover { background: var(--text); transform: translateY(-2px); }
+.btn-secondary { background: transparent; color: var(--text);
+  border: 1px solid rgba(240,244,248,0.2); padding: 1rem 2.5rem;
+  font-family: var(--font-b); font-weight: 400; font-size: 1rem;
+  cursor: pointer; transition: all 0.2s; }
+.btn-secondary:hover { border-color: var(--acc); color: var(--acc); }
+.hero-stats { position: relative; z-index: 2;
+  display: flex; gap: 3rem; margin-top: 5rem; padding-top: 3rem;
+  border-top: 1px solid rgba(240,244,248,0.08); flex-wrap: wrap; }
+.hero-stat-num { font-family: var(--font-d); font-size: 2.5rem;
+  font-weight: 900; color: var(--acc); line-height: 1; }
+.hero-stat-label { font-size: 0.85rem; color: var(--muted); margin-top: 4px; }
+
+/* ═══ TICKER ═══ */
+.ticker-wrap { overflow: hidden; border-top: 1px solid rgba(0,230,118,0.15);
+  border-bottom: 1px solid rgba(0,230,118,0.15); padding: 0.75rem 0;
+  background: rgba(0,230,118,0.03); }
+.ticker { display: flex; gap: 4rem; animation: ticker 30s linear infinite;
+  white-space: nowrap; }
+.ticker-item { font-family: var(--font-m); font-size: 0.8rem; color: var(--muted);
+  letter-spacing: 0.06em; display: flex; align-items: center; gap: 8px; }
+.ticker-item .dot { color: var(--acc); }
+@keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* ═══ LABELS ═══ */
+.label { font-family: var(--font-m); font-size: 0.75rem; color: var(--acc);
+  letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 8px; }
+.label::before { content: ''; width: 24px; height: 1px; background: var(--acc); }
+.label-center { justify-content: center; }
+.label-center::before { display: none; }
+
+/* ═══ PICK DESTACADO ═══ */
+.pick-section { padding: 6rem 0 2rem; }
+.pick-hero { background: linear-gradient(135deg, rgba(0,230,118,0.08), rgba(0,230,118,0.02));
+  border: 1px solid rgba(0,230,118,0.25); padding: 3rem; position: relative;
+  overflow: hidden; }
+.pick-hero::before { content: ''; position: absolute; top: 0; right: 0;
+  width: 280px; height: 280px;
+  background: radial-gradient(circle, rgba(0,230,118,0.15), transparent 70%); }
+.pick-label-pill { display: inline-block; font-family: var(--font-m);
+  font-size: 0.7rem; color: var(--bg); background: var(--acc);
+  padding: 4px 12px; letter-spacing: 0.1em; text-transform: uppercase;
+  margin-bottom: 1.5rem; font-weight: 600; position: relative; z-index: 1; }
+.pick-title { font-size: clamp(1.5rem, 3vw, 2.2rem); margin-bottom: .5rem;
+  position: relative; z-index: 1; }
+.pick-sub { color: var(--muted); margin-bottom: 1.5rem; font-size: 0.95rem;
+  position: relative; z-index: 1; }
+.pick-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;
+  margin: 2rem 0; position: relative; z-index: 1; }
+.pick-stat { padding: 1rem; background: rgba(0,0,0,0.4);
+  border-left: 2px solid var(--acc); }
+.pick-stat-l { font-family: var(--font-m); font-size: 0.7rem; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+.pick-stat-v { font-family: var(--font-d); font-size: 1.7rem; font-weight: 700;
+  color: var(--acc); }
+.pick-just { color: var(--muted); font-size: 0.9rem; margin-top: 1.5rem;
+  padding-top: 1.25rem; border-top: 1px solid rgba(240,244,248,0.06);
+  position: relative; z-index: 1; }
+.pick-just strong { color: var(--text); }
+
+/* ═══ DASHBOARD ═══ */
+.dashboard { padding: 5rem 0; }
+.dashboard-header { text-align: center; margin-bottom: 3rem; }
+.dashboard-header p { color: var(--muted); max-width: 550px; margin: 1rem auto 0; }
+.demo-badge { display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(0,230,118,0.1); border: 1px solid rgba(0,230,118,0.3);
+  color: var(--acc); font-family: var(--font-m); font-size: 0.7rem;
+  padding: 4px 10px; letter-spacing: 0.06em; text-transform: uppercase;
+  margin-left: 8px; white-space: nowrap; vertical-align: middle; }
+.demo-banner { background: rgba(0,230,118,0.05); border-left: 3px solid var(--acc);
+  padding: 12px 16px; margin: 1.5rem 0; font-size: 0.85rem; color: var(--muted); }
+.demo-banner strong { color: var(--acc); }
+
+.bank-config { background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(0,230,118,0.15); padding: 2rem; margin-bottom: 2rem; }
+.bank-title { font-family: var(--font-m); font-size: 0.75rem; color: var(--acc);
+  letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 1.5rem; }
+.cfg-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.cfg-field label { display: block; font-size: 0.8rem; color: var(--muted);
+  margin-bottom: 8px; font-family: var(--font-m); text-transform: uppercase;
+  letter-spacing: 0.05em; }
+.cfg-field input[type="range"] { width: 100%; -webkit-appearance: none;
+  height: 3px; background: rgba(255,255,255,0.1); outline: none; cursor: pointer; }
+.cfg-field input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none;
+  width: 16px; height: 16px; background: var(--acc);
+  border-radius: 50%; cursor: pointer; }
+.cfg-val { font-family: var(--font-d); font-size: 1.4rem; font-weight: 700;
+  color: var(--text); margin-top: 6px; }
+
+.kpi-strip { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px;
+  background: rgba(0,230,118,0.08); border: 1px solid rgba(0,230,118,0.12);
+  margin-bottom: 2rem; }
+.kpi-box { background: var(--bg); padding: 1.25rem 1.5rem; }
+.kpi-l { font-family: var(--font-m); font-size: 0.7rem; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+.kpi-v { font-family: var(--font-d); font-size: 1.6rem; font-weight: 700;
+  color: var(--text); }
+.kpi-v.acc { color: var(--acc); }
+.kpi-s { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+
+.combos-grid { display: flex; flex-direction: column; gap: 12px; }
+.combo-card { background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(240,244,248,0.06); transition: border-color 0.2s; }
+.combo-card:hover { border-color: rgba(0,230,118,0.3); }
+.combo-head { display: grid;
+  grid-template-columns: 36px 1fr auto auto auto auto auto; align-items: center;
+  gap: 12px; padding: 1rem 1.25rem; cursor: pointer; }
+.combo-num { width: 32px; height: 32px; border-radius: 50%; display: flex;
+  align-items: center; justify-content: center; font-family: var(--font-m);
+  font-size: 0.8rem; font-weight: 700; background: var(--acc); color: var(--bg); }
+.combo-title { font-weight: 500; font-size: 0.95rem; }
+.combo-liga { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+.ev-pill { font-family: var(--font-m); font-size: 0.72rem; padding: 3px 10px;
+  font-weight: 500; white-space: nowrap; background: rgba(0,230,118,0.15);
+  color: var(--acc); border: 1px solid rgba(0,230,118,0.3); }
+.combo-odds { font-family: var(--font-d); font-size: 1.2rem; font-weight: 700;
+  white-space: nowrap; }
+.combo-inv-v { font-family: var(--font-m); font-size: 0.85rem; color: var(--muted);
+  white-space: nowrap; text-align: right; }
+.combo-ret-v { font-family: var(--font-m); font-size: 0.85rem; color: var(--acc);
+  white-space: nowrap; text-align: right; }
+.chev { color: var(--muted); font-size: 0.75rem; transition: transform 0.25s; }
+.chev.open { transform: rotate(180deg); }
+.combo-body { display: none; border-top: 1px solid rgba(240,244,248,0.05); padding: 1.25rem; }
+.picks-tbl { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-bottom: 1rem; }
+.picks-tbl th { text-align: left; font-family: var(--font-m); font-size: 0.68rem;
+  color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em;
+  padding: 6px 8px; border-bottom: 1px solid rgba(240,244,248,0.06); }
+.picks-tbl td { padding: 7px 8px; border-bottom: 1px solid rgba(240,244,248,0.04); }
+.mkt-tag { font-family: var(--font-m); font-size: 0.68rem; padding: 2px 8px;
+  background: rgba(255,255,255,0.05); color: var(--muted); }
+.justif-box { background: rgba(0,230,118,0.05); border-left: 2px solid var(--acc);
+  padding: 1rem; margin-bottom: 1rem; font-size: 0.85rem; line-height: 1.6; }
+.justif-box .lbl { font-family: var(--font-m); font-size: 0.7rem;
+  color: var(--acc); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+
+.dist-section { margin-top: 2.5rem; }
+.dist-title { font-family: var(--font-m); font-size: 0.72rem; color: var(--acc);
+  text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1rem; }
+.dist-bars { display: flex; flex-direction: column; gap: 8px; }
+.dist-row { display: flex; align-items: center; gap: 12px; }
+.dist-lbl { font-size: 0.78rem; color: var(--muted); min-width: 180px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dist-bar { flex: 1; height: 20px; background: rgba(255,255,255,0.05);
+  position: relative; overflow: hidden; }
+.dist-fill { height: 100%; display: flex; align-items: center; padding-left: 8px;
+  font-family: var(--font-m); font-size: 0.72rem; font-weight: 500;
+  white-space: nowrap; background: var(--acc); color: var(--bg);
+  transition: width 0.6s ease; }
+.dist-ret { font-family: var(--font-m); font-size: 0.78rem; color: var(--acc);
+  min-width: 90px; text-align: right; }
+
+/* ═══ MERCADOS ═══ */
+.section-pad { padding: 6rem 0; }
+.mkt-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+  margin-top: 3rem; background: rgba(255,255,255,0.05); }
+.mkt-item { background: var(--bg); padding: 1.5rem; transition: all 0.2s;
+  border: 1px solid transparent; }
+.mkt-item:hover { border-color: rgba(0,230,118,0.3); background: rgba(255,255,255,0.02); }
+.mkt-ico { width: 40px; height: 40px; border: 1px solid rgba(0,230,118,0.3);
+  display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+  margin-bottom: 1rem; color: var(--acc); }
+.mkt-name { font-weight: 500; margin-bottom: 4px; font-size: 0.95rem; }
+.mkt-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
+.mkt-ev { font-family: var(--font-m); font-size: 0.72rem; color: var(--acc); margin-top: 10px; }
+
+/* ═══ CASAS DE APUESTAS con foto ═══ */
+.casas-section { padding: 6rem 0; position: relative; overflow: hidden; }
+.casas-bg { position: absolute; inset: 0; z-index: 0; }
+.casas-bg img { width: 100%; height: 100%; object-fit: cover; opacity: 0.05;
+  filter: grayscale(1) contrast(1.4) brightness(0.6); }
+.casas-bg::after { content: ''; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(8,11,15,0.95) 0%, rgba(8,11,15,0.85) 50%, rgba(8,11,15,0.95) 100%); }
+.casas-section .container { position: relative; z-index: 2; }
+.casas-section h2 { color: var(--text); }
+.casas-section > .container > p { color: var(--text); opacity: 0.85; }
+.casas-grid { display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px; margin-top: 3rem; }
+.casa-btn { display: flex; align-items: center; justify-content: space-between;
+  padding: 1.2rem 1.5rem; background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06); color: var(--text);
+  transition: all 0.2s; position: relative; overflow: hidden; }
+.casa-btn::after { content: ''; position: absolute; bottom: 0; left: 0;
+  width: 0; height: 2px; background: var(--acc); transition: width 0.3s; }
+.casa-btn:hover { border-color: rgba(0,230,118,0.4); transform: translateY(-2px); }
+.casa-btn:hover::after { width: 100%; }
+.casa-name { font-weight: 500; font-size: 0.95rem; }
+.casa-tag { font-family: var(--font-m); font-size: 0.7rem; color: var(--muted); }
+.casa-arrow { color: var(--acc); font-size: 1.2rem; transition: transform 0.2s; }
+.casa-btn:hover .casa-arrow { transform: translateX(4px); }
+.casa-recom { background: linear-gradient(135deg, rgba(0,230,118,0.08), rgba(255,255,255,0.03));
+  border-color: rgba(0,230,118,0.3); }
+.casa-recom .casa-name::after { content: ' ★'; color: var(--acc); }
+.alerta { background: rgba(0,230,118,0.04); border-left: 2px solid var(--acc);
+  padding: 1rem; margin-top: 2rem; font-size: 0.82rem; color: var(--muted); }
+
+/* ═══ PILARES ═══ */
+.pilares-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem; margin-top: 3rem; }
+.pilar { background: rgba(255,255,255,0.02); padding: 1.75rem;
+  border: 1px solid rgba(240,244,248,0.06); position: relative;
+  transition: all 0.2s; }
+.pilar:hover { border-color: rgba(0,230,118,0.3); transform: translateY(-3px); }
+.pilar-num { position: absolute; top: 1rem; right: 1.5rem; font-family: var(--font-d);
+  font-size: 3rem; font-weight: 900; color: rgba(0,230,118,0.1); line-height: 1; }
+.pilar-ico { width: 36px; height: 36px; color: var(--acc); margin-bottom: 1rem; }
+.pilar-t { font-weight: 500; margin-bottom: 6px; font-size: 1rem; }
+.pilar-d { color: var(--muted); font-size: 0.85rem; line-height: 1.6; }
+
+/* ═══ FAQ ═══ */
+.faq-list { margin-top: 3rem; display: flex; flex-direction: column; gap: 12px; }
+.faq-item { background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(240,244,248,0.06); transition: border-color 0.2s; }
+.faq-item:hover { border-color: rgba(0,230,118,0.2); }
+.faq-q { padding: 1.25rem 1.5rem; cursor: pointer; display: flex;
+  justify-content: space-between; align-items: center; font-weight: 500;
+  font-size: 0.95rem; }
+.faq-q::after { content: '+'; color: var(--acc); font-size: 1.5rem;
+  font-weight: 300; transition: transform 0.2s; }
+.faq-item.open .faq-q::after { transform: rotate(45deg); }
+.faq-a { max-height: 0; overflow: hidden; transition: max-height 0.3s ease;
+  padding: 0 1.5rem; color: var(--muted); font-size: 0.9rem; line-height: 1.7; }
+.faq-item.open .faq-a { max-height: 400px; padding: 0 1.5rem 1.25rem; }
+
+/* ═══ TELEGRAM CTA ═══ */
+.tg-section { padding: 6rem 0; }
+.tg-card { background: linear-gradient(135deg, rgba(0,230,118,0.06), rgba(255,255,255,0.02));
+  border: 1px solid rgba(0,230,118,0.25); padding: 3rem; text-align: center;
+  position: relative; overflow: hidden; }
+.tg-card::before { content: ''; position: absolute; top: -50px; left: 50%;
+  transform: translateX(-50%); width: 400px; height: 200px;
+  background: radial-gradient(ellipse, rgba(0,230,118,0.12), transparent 70%); }
+.tg-ico { width: 72px; height: 72px; margin: 0 auto 1.5rem;
+  background: var(--acc); border-radius: 50%; display: flex;
+  align-items: center; justify-content: center; font-size: 2rem; color: var(--bg);
+  position: relative; z-index: 1; box-shadow: 0 0 50px rgba(0,230,118,0.3); }
+.tg-card h2 { margin-bottom: 1rem; position: relative; z-index: 1; }
+.tg-card p { color: var(--muted); max-width: 500px; margin: 0 auto 2rem;
+  position: relative; z-index: 1; }
+.btn-tg { display: inline-flex; align-items: center; gap: 10px; background: var(--acc);
+  color: var(--bg); padding: 1rem 2.5rem; font-size: 1rem; font-weight: 600;
+  transition: all 0.2s; position: relative; z-index: 1; }
+.btn-tg:hover { transform: translateY(-2px); }
+.tg-stats { display: flex; gap: 3rem; justify-content: center; margin-top: 2rem;
+  padding-top: 2rem; border-top: 1px solid rgba(240,244,248,0.08);
+  position: relative; z-index: 1; flex-wrap: wrap; }
+.tg-stat-n { font-family: var(--font-d); font-size: 1.8rem; font-weight: 700; color: var(--acc); }
+.tg-stat-l { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
+
+/* ═══ ROI CHART ═══ */
+.roi-section { padding: 4rem 0 6rem; }
+.roi-wrap { background: rgba(255,255,255,0.02); border: 1px solid rgba(0,230,118,0.15);
+  padding: 2rem; margin-top: 1.5rem; }
+.roi-chart-svg { width: 100%; height: 240px; display: block; }
+.roi-legend { display: flex; gap: 1.5rem; margin-top: 1rem; flex-wrap: wrap;
+  font-family: var(--font-m); font-size: 0.78rem; color: var(--muted); }
+.roi-dot { display: inline-block; width: 10px; height: 10px;
+  border-radius: 50%; background: var(--acc); margin-right: 4px;
+  vertical-align: middle; }
+
+/* ═══ CTA FINAL con foto ═══ */
+.cta-section { padding: 8rem 0; text-align: center; position: relative; overflow: hidden; }
+.cta-bg { position: absolute; inset: 0; z-index: 0; }
+.cta-bg img { width: 100%; height: 100%; object-fit: cover; opacity: 0.08;
+  filter: contrast(1.2) brightness(0.4); }
+.cta-bg::after { content: ''; position: absolute; inset: 0;
+  background: linear-gradient(to bottom, rgba(8,11,15,0.6), rgba(8,11,15,0.95)); }
+.cta-section .container { position: relative; z-index: 2; }
+.cta-section h2 { margin-bottom: 1.25rem; color: var(--text); }
+.cta-section p { color: var(--text); opacity: 0.85; max-width: 500px; margin: 0 auto 3rem; }
+.cta-section .btn-primary { position: relative; z-index: 1; }
+
+/* ═══ FOOTER ═══ */
+footer { border-top: 1px solid rgba(240,244,248,0.06); padding: 3rem 0;
+  font-size: 0.82rem; color: var(--muted); }
+.foot-in { display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 1rem; }
+.disclaimer { max-width: 500px; font-size: 0.72rem; opacity: 0.7; line-height: 1.5; }
+
+/* ═══ ANIMACIONES ═══ */
+@keyframes fade-up { from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); } }
+.fade { animation: fade-up 0.7s ease both; }
+.fade-2 { animation: fade-up 0.7s 0.15s ease both; }
+.fade-3 { animation: fade-up 0.7s 0.3s ease both; }
+.fade-4 { animation: fade-up 0.7s 0.45s ease both; }
+@keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(0,230,118,0.3); }
+  50% { box-shadow: 0 0 0 8px rgba(0,230,118,0); } }
+.pulse { animation: pulse 2.5s infinite; }
+@keyframes breathe { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+.live { display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--acc); animation: breathe 2s infinite; margin-right: 6px; }
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 900px) {
+  .kpi-strip { grid-template-columns: repeat(3, 1fr); }
+  .cfg-grid, .pick-stats { grid-template-columns: repeat(2, 1fr); }
+  .mkt-grid { grid-template-columns: repeat(2, 1fr); }
+  .nav-links { display: none; }
+  .combo-head { grid-template-columns: 36px 1fr auto auto auto; }
+  .combo-ret-v, .combo-inv-v { display: none; }
+  .pick-hero { padding: 2rem; }
+}
+@media (max-width: 600px) {
+  .kpi-strip { grid-template-columns: repeat(2, 1fr); }
+  .mkt-grid, .pick-stats { grid-template-columns: 1fr; }
+  .hero-stats { gap: 1.5rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV con logo SVG -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="logo">
+      <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+        <!-- Soccer ball: classic pentagon pattern -->
+        <circle cx="20" cy="20" r="18" fill="#00E676"/>
+        <!-- Top pentagon (dark) -->
+        <polygon points="20,7 24.5,11.5 22.5,17 17.5,17 15.5,11.5" fill="#080B0F"/>
+        <!-- Bottom-left pentagon (dark) -->
+        <polygon points="9.5,22 14.5,18 17.5,22 15.5,28 10,27" fill="#080B0F"/>
+        <!-- Bottom-right pentagon (dark) -->
+        <polygon points="30.5,22 25.5,18 22.5,22 24.5,28 30,27" fill="#080B0F"/>
+        <!-- Center small pentagon -->
+        <polygon points="20,20 22.5,22 21.5,25 18.5,25 17.5,22" fill="#080B0F" opacity="0.85"/>
+        <!-- Connecting stitches (subtle lines) -->
+        <line x1="20" y1="17" x2="20" y2="20" stroke="#080B0F" stroke-width="0.6"/>
+        <line x1="17.5" y1="22" x2="15.5" y2="22" stroke="#080B0F" stroke-width="0.6"/>
+        <line x1="22.5" y1="22" x2="24.5" y2="22" stroke="#080B0F" stroke-width="0.6"/>
+        <line x1="18.5" y1="25" x2="17" y2="27.5" stroke="#080B0F" stroke-width="0.6"/>
+        <line x1="21.5" y1="25" x2="23" y2="27.5" stroke="#080B0F" stroke-width="0.6"/>
+      </svg>
+      GOLAZO<span>AI</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#pick">Pick top</a></li>
+      <li><a href="#dashboard">Combos</a></li>
+      <li><a href="#casas">Casas</a></li>
+      <li><a href="#telegram">Telegram</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+    <button class="nav-cta" onclick="document.getElementById('dashboard').scrollIntoView({behavior:'smooth'})">
+      Ver Combos
+    </button>
+  </div>
+</nav>
+
+<!-- HERO con imagen de estadio -->
+<section class="hero">
+  <div class="hero-bg">
+    <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1600&q=80" alt="Estadio" loading="lazy">
+  </div>
+  <div class="container">
+    <div class="hero-eyebrow fade">Inteligencia artificial · Fútbol · Colombia</div>
+    <h1 class="hero-title fade-2">Apuestas con<br><em>ventaja real</em>,<br>no con suerte.</h1>
+    <p class="hero-subtitle fade-3">
+      Análisis diario de partidos combinando xG, estado anímico, lesionados, contexto de liga y 12 mercados de apuesta. Combos listos con distribución inteligente de tu bankroll en COP.
+    </p>
+    <div class="hero-actions fade-4">
+      <a href="#pick" class="btn-primary pulse">Ver pick del día →</a>
+      <a href="#faq" class="btn-secondary">Cómo funciona</a>
+    </div>
+    <div class="hero-stats fade-4">
+      <div><div class="hero-stat-num" id="stat-ev">+11.4%</div><div class="hero-stat-label">EV promedio</div></div>
+      <div><div class="hero-stat-num">8</div><div class="hero-stat-label">Combos por día</div></div>
+      <div><div class="hero-stat-num">12</div><div class="hero-stat-label">Mercados</div></div>
+      <div><div class="hero-stat-num">5</div><div class="hero-stat-label">Ligas</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker" id="ticker">
+    <span class="ticker-item"><span class="dot">●</span> Real Madrid vs Barça — EV +14.2% — @2.10</span>
+    <span class="ticker-item"><span class="dot">●</span> Arsenal BTTS Sí — EV +9.8% — @1.75</span>
+    <span class="ticker-item"><span class="dot">●</span> PSG Over 2.5 — EV +11.1% — @1.72</span>
+    <span class="ticker-item"><span class="dot">●</span> Leverkusen Gana — EV +8.4% — @1.85</span>
+    <span class="ticker-item"><span class="dot">●</span> Real Madrid vs Barça — EV +14.2% — @2.10</span>
+    <span class="ticker-item"><span class="dot">●</span> Arsenal BTTS Sí — EV +9.8% — @1.75</span>
+    <span class="ticker-item"><span class="dot">●</span> PSG Over 2.5 — EV +11.1% — @1.72</span>
+    <span class="ticker-item"><span class="dot">●</span> Leverkusen Gana — EV +8.4% — @1.85</span>
+  </div>
+</div>
+
+<!-- PICK DESTACADO -->
+<section class="pick-section" id="pick">
+  <div class="container">
+    <div class="label"><span class="live"></span> Pick destacado del día</div>
+    <div class="pick-hero">
+      <span class="pick-label-pill">🔥 Top EV</span>
+      <h2 class="pick-title" id="ph-title">Cargando…</h2>
+      <p class="pick-sub" id="ph-sub">El sistema escoge el pick con mayor valor esperado.</p>
+      <div class="pick-stats">
+        <div class="pick-stat"><div class="pick-stat-l">Cuota</div><div class="pick-stat-v" id="ph-cuota">—</div></div>
+        <div class="pick-stat"><div class="pick-stat-l">EV</div><div class="pick-stat-v" id="ph-ev">—</div></div>
+        <div class="pick-stat"><div class="pick-stat-l">Confianza</div><div class="pick-stat-v" id="ph-conf">—</div></div>
+        <div class="pick-stat"><div class="pick-stat-l">Inversión</div><div class="pick-stat-v" id="ph-inv">—</div></div>
+      </div>
+      <p class="pick-just"><strong>¿Por qué este pick?</strong> <span id="ph-just">Se calculará al cargar.</span></p>
+    </div>
+  </div>
+</section>
+
+<!-- DASHBOARD -->
+<section class="dashboard" id="dashboard">
+  <div class="container">
+    <div class="dashboard-header">
+      <div class="label label-center">Panel de control</div>
+      <h2>Combos del día — <span id="fecha-hoy" style="color:var(--acc)"></span><span class="demo-badge" id="modo-badge">● Datos demo</span></h2>
+      <p>Ajusta tu bankroll y el sistema redistribuye las inversiones con Kelly fraccionado.</p>
+    </div>
+    <div class="demo-banner" id="demo-banner">
+      <strong>Vista de demostración.</strong> Estos son combos de ejemplo. Cuando el motor genere combos reales, esta sección mostrará los datos en vivo automáticamente.
+    </div>
+    <div class="bank-config">
+      <div class="bank-title">▸ Configurar bankroll</div>
+      <div class="cfg-grid">
+        <div class="cfg-field">
+          <label>Mi Bankroll (COP)</label>
+          <input type="range" min="20000" max="5000000" step="10000" value="200000" id="sl-bank" oninput="recalc()">
+          <div class="cfg-val mono" id="out-bank">$200.000</div>
+        </div>
+        <div class="cfg-field">
+          <label>Riesgo Diario Máx.</label>
+          <input type="range" min="5" max="20" step="1" value="10" id="sl-risk" oninput="recalc()">
+          <div class="cfg-val mono" id="out-risk">10%</div>
+        </div>
+        <div class="cfg-field">
+          <label>EV Mínimo Aceptado</label>
+          <input type="range" min="5" max="18" step="1" value="8" id="sl-ev" oninput="recalc()">
+          <div class="cfg-val mono" id="out-ev">8%</div>
+        </div>
+      </div>
+    </div>
+    <div class="kpi-strip" id="kpi-strip"></div>
+    <div class="combos-grid" id="combos-grid"></div>
+    <div class="dist-section">
+      <div class="dist-title">▸ Distribución del bankroll por combo</div>
+      <div class="dist-bars" id="dist-bars"></div>
+    </div>
+  </div>
+</section>
+
+<!-- MERCADOS -->
+<section class="section-pad" id="mercados">
+  <div class="container">
+    <div class="label">Mercados cubiertos</div>
+    <h2>Más allá del resultado final.</h2>
+    <p style="color:var(--muted);max-width:550px;margin-top:.75rem">12 tipos de mercado para encontrar valor donde otros no miran.</p>
+    <div class="mkt-grid">
+      <div class="mkt-item"><div class="mkt-ico">⚽</div><div class="mkt-name">1X2 Resultado</div><div class="mkt-desc">Quién gana, ajustado por todos los factores contextuales.</div><div class="mkt-ev">EV típico: +9–14%</div></div>
+      <div class="mkt-item"><div class="mkt-ico">🎯</div><div class="mkt-name">BTTS Ambos marcan</div><div class="mkt-desc">Modelo de goles basado en xG de ataque y defensa.</div><div class="mkt-ev">EV típico: +8–12%</div></div>
+      <div class="mkt-item"><div class="mkt-ico">📈</div><div class="mkt-name">Over/Under goles</div><div class="mkt-desc">Predicción de goles totales ponderando H2H y xG.</div><div class="mkt-ev">EV típico: +7–11%</div></div>
+      <div class="mkt-item"><div class="mkt-ico">🔄</div><div class="mkt-name">Córners totales</div><div class="mkt-desc">Correlaciona con posesión y táctica del equipo.</div><div class="mkt-ev">EV típico: +8–13%</div></div>
+      <div class="mkt-item"><div class="mkt-ico">🟨</div><div class="mkt-name">Tarjetas</div><div class="mkt-desc">Amarillas, rojas, primer amonestado, total partido.</div><div class="mkt-ev">EV típico: +9–15%</div></div>
+      <div class="mkt-item"><div class="mkt-ico">🎪</div><div class="mkt-name">Tiros a puerta</div><div class="mkt-desc">Total y por jugador estrella, basado en xG individual.</div><div class="mkt-ev">EV típico: +8–12%</div></div>
+      <div class="mkt-item"><div class="mkt-ico">⚡</div><div class="mkt-name">Faltas totales</div><div class="mkt-desc">Patrón del árbitro + estilos defensivos de ambos.</div><div class="mkt-ev">EV típico: +7–10%</div></div>
+      <div class="mkt-item"><div class="mkt-ico">⚖️</div><div class="mkt-name">Hándicap asiático</div><div class="mkt-desc">Elimina el empate y da ventaja al equipo débil.</div><div class="mkt-ev">EV típico: +8–13%</div></div>
+      <div class="mkt-item"><div class="mkt-ico">🥇</div><div class="mkt-name">Primer goleador</div><div class="mkt-desc">Delanteros titulares con xG individual y rol táctico.</div><div class="mkt-ev">EV típico: +10–18%</div></div>
+      <div class="mkt-item"><div class="mkt-ico">🕐</div><div class="mkt-name">Minuto del primer gol</div><div class="mkt-desc">Distribución temporal histórica. Alto EV en exóticos.</div><div class="mkt-ev">EV típico: +12–20%</div></div>
+      <div class="mkt-item"><div class="mkt-ico">🎲</div><div class="mkt-name">Doble oportunidad</div><div class="mkt-desc">Cubre 2 de 3 resultados. Menor cuota, mayor seguridad.</div><div class="mkt-ev">EV típico: +5–8%</div></div>
+      <div class="mkt-item"><div class="mkt-ico">📌</div><div class="mkt-name">Resultado exacto</div><div class="mkt-desc">Marcador final. Cuotas altas. Sistema lo usa agresivo.</div><div class="mkt-ev">EV típico: +15–30%</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CASAS DE APUESTAS con foto de estadio -->
+<section class="casas-section" id="casas">
+  <div class="casas-bg">
+    <img src="https://images.unsplash.com/photo-1551958219-acbc608c6377?w=1600&q=80" alt="Stadium lights" loading="lazy">
+  </div>
+  <div class="container">
+    <div class="label">Casas de apuestas legales en Colombia</div>
+    <h2>Apuesta donde tenga sentido.</h2>
+    <p style="color:var(--muted);max-width:580px;margin-top:.75rem">
+      Casas reguladas por Coljuegos. El sistema escoge la mejor cuota para cada pick. Clic directo para abrir cada una.
+    </p>
+    <div class="casas-grid">
+      <a href="https://www.wplay.co/" target="_blank" rel="noopener" class="casa-btn casa-recom">
+        <div><div class="casa-name">Wplay</div><div class="casa-tag">Líder Colombia</div></div><span class="casa-arrow">→</span>
+      </a>
+      <a href="https://www.betplay.com.co/" target="_blank" rel="noopener" class="casa-btn casa-recom">
+        <div><div class="casa-name">BetPlay</div><div class="casa-tag">Cuotas competitivas</div></div><span class="casa-arrow">→</span>
+      </a>
+      <a href="https://www.codere.com.co/" target="_blank" rel="noopener" class="casa-btn">
+        <div><div class="casa-name">Codere</div><div class="casa-tag">Fuerte en La Liga</div></div><span class="casa-arrow">→</span>
+      </a>
+      <a href="https://stake.com.co/" target="_blank" rel="noopener" class="casa-btn">
+        <div><div class="casa-name">Stake</div><div class="casa-tag">Mercados exóticos</div></div><span class="casa-arrow">→</span>
+      </a>
+      <a href="https://www.rushbet.co/" target="_blank" rel="noopener" class="casa-btn">
+        <div><div class="casa-name">Rushbet</div><div class="casa-tag">Bono inicial</div></div><span class="casa-arrow">→</span>
+      </a>
+      <a href="https://www.betsson.co/" target="_blank" rel="noopener" class="casa-btn">
+        <div><div class="casa-name">Betsson</div><div class="casa-tag">Europeo</div></div><span class="casa-arrow">→</span>
+      </a>
+      <a href="https://www.luckia.com.co/" target="_blank" rel="noopener" class="casa-btn">
+        <div><div class="casa-name">Luckia</div><div class="casa-tag">Live betting</div></div><span class="casa-arrow">→</span>
+      </a>
+      <a href="https://www.yajuego.co/" target="_blank" rel="noopener" class="casa-btn">
+        <div><div class="casa-name">Yajuego</div><div class="casa-tag">100% colombiana</div></div><span class="casa-arrow">→</span>
+      </a>
+    </div>
+    <div class="alerta">⚠️ Apuesta con responsabilidad. Solo para mayores de 18 años. Línea Coljuegos: <strong>01 8000 18 1411</strong>.</div>
+  </div>
+</section>
+
+<!-- PILARES -->
+<section class="section-pad" id="pilares">
+  <div class="container">
+    <div class="label">Por qué confiar en el sistema</div>
+    <h2>Cinco pilares fundamentales.</h2>
+    <p style="color:var(--muted);max-width:580px;margin-top:.75rem">No es una caja negra. Cada predicción se construye con principios matemáticos verificables.</p>
+    <div class="pilares-grid">
+      <div class="pilar"><div class="pilar-num">01</div><svg class="pilar-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg><div class="pilar-t">Modelo probabilístico</div><div class="pilar-d">Calcula la probabilidad real con xG, forma, lesionados y H2H. Solo apostamos cuando la probabilidad supera la implícita en la cuota.</div></div>
+      <div class="pilar"><div class="pilar-num">02</div><svg class="pilar-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><div class="pilar-t">Kelly fraccionado</div><div class="pilar-d">Apostamos a 1/4 de Kelly. Maximiza el crecimiento del bankroll a largo plazo y reduce 75% la varianza.</div></div>
+      <div class="pilar"><div class="pilar-num">03</div><svg class="pilar-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 7L12 3 4 7l8 4 8-4z"/><path d="M4 12l8 4 8-4M4 17l8 4 8-4"/></svg><div class="pilar-t">Bankroll inteligente</div><div class="pilar-d">Stakes auto-ajustados según riesgo, número de combos, confianza y drawdown actual.</div></div>
+      <div class="pilar"><div class="pilar-num">04</div><svg class="pilar-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg><div class="pilar-t">Aprendizaje continuo</div><div class="pilar-d">Detecta sesgos del modelo y ajusta los pesos según el hit rate histórico de cada mercado.</div></div>
+      <div class="pilar"><div class="pilar-num">05</div><svg class="pilar-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg><div class="pilar-t">Tracking riguroso</div><div class="pilar-d">Cada pick se guarda con su cuota y probabilidad. Al verificar resultados ves tu ROI real, sin maquillar.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section-pad" id="faq">
+  <div class="container">
+    <div class="label">Preguntas frecuentes</div>
+    <h2>Lo que todos preguntan.</h2>
+    <div class="faq-list">
+      <div class="faq-item"><div class="faq-q" onclick="this.parentNode.classList.toggle('open')">¿Cuánto dinero necesito para empezar?</div><div class="faq-a">El sistema funciona desde $50.000 COP. Tus stakes serán proporcionales (entre $1.000 y $5.000 COP por combo si tienes bankroll pequeño). Lo importante es la disciplina, no el tamaño.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="this.parentNode.classList.toggle('open')">¿Cuánto puedo ganar al mes?</div><div class="faq-a">Si el sistema valida 5-10% de ROI mensual, con $500.000 COP serían $25.000-50.000 COP promedio. NO esperes ganar siempre; habrá semanas en rojo. Lo importante es la rentabilidad acumulada en 3-6 meses.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="this.parentNode.classList.toggle('open')">¿Las casas me van a bloquear si gano?</div><div class="faq-a">Las casas legales colombianas no suelen bloquear apostadores con stakes pequeños. Si apuestas $2.000-$20.000 COP por combo, no llamas la atención.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="this.parentNode.classList.toggle('open')">¿Por qué solo Jueves, Viernes y Sábado?</div><div class="faq-a">La mayoría del fútbol europeo y colombiano se concentra de viernes a domingo. Concentrar en esos días maximiza el plan FREE de la API y se enfoca en los días con más valor.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="this.parentNode.classList.toggle('open')">¿Qué pasa si pierdo varias seguidas?</div><div class="faq-a">Es normal. El sistema asume que perderás 4-5 combos seguidos varias veces al año. Por eso Kelly fraccionado y nunca arriesga más del 10% del bankroll por día. Si detecta drawdown alto (>15%), reduce automáticamente los stakes.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="this.parentNode.classList.toggle('open')">¿El sistema realmente le gana a las casas?</div><div class="faq-a">Solo lo sabes con tu propio historial. Por eso los primeros 60-90 días son modo sombra (paper trade). Si después de ese periodo tu ROI es positivo, activas producción. Si es negativo, no perdiste un peso.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- TELEGRAM CTA -->
+<section class="tg-section" id="telegram">
+  <div class="container">
+    <div class="tg-card">
+      <div class="tg-ico">✈</div>
+      <h2>Combos cada mañana en tu Telegram.</h2>
+      <p>El bot del sistema te envía los combos analizados directo a tu chat. Listos para apostar con cuotas, inversión recomendada y confianza de cada pick.</p>
+      <a href="https://t.me/" target="_blank" rel="noopener" class="btn-tg" id="btn-tg">✈ Abrir mi chat de Telegram</a>
+      <div class="tg-stats">
+        <div><div class="tg-stat-n" id="tg-c">—</div><div class="tg-stat-l">Combos enviados</div></div>
+        <div><div class="tg-stat-n" id="tg-h">—%</div><div class="tg-stat-l">Hit rate global</div></div>
+        <div><div class="tg-stat-n" id="tg-r">+0%</div><div class="tg-stat-l">ROI acumulado</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL con imagen -->
+<section class="cta-section">
+  <div class="cta-bg">
+    <img src="https://images.unsplash.com/photo-1486286701208-1d58e9338013?w=1600&q=80" alt="Fútbol" loading="lazy">
+  </div>
+  <div class="container">
+    <div class="label label-center">Empieza hoy</div>
+    <h2>La ventaja estadística<br>es real. Úsala.</h2>
+    <p>El sistema corre 100% en tu computador. Gratis. Sin suscripciones.</p>
+    <a href="#faq" class="btn-primary" style="display:inline-flex">Ver cómo instalarlo →</a>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="foot-in">
+      <div class="logo"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="#00E676"/><polygon points="20,7 24.5,11.5 22.5,17 17.5,17 15.5,11.5" fill="#080B0F"/><polygon points="9.5,22 14.5,18 17.5,22 15.5,28 10,27" fill="#080B0F"/><polygon points="30.5,22 25.5,18 22.5,22 24.5,28 30,27" fill="#080B0F"/></svg> GOLAZO<span>AI</span></div>
+      <p class="disclaimer">Sistema de análisis estadístico. Las apuestas implican riesgo de pérdida. Mayor de 18 años. Línea Coljuegos: 01 8000 18 1411.</p>
+    </div>
+  </div>
+</footer>
+
+<script src="data.js" onerror="window.GOLAZO_DATA_MISSING=true"></script>
+<script>
+const HAS_REAL = typeof window.GOLAZO_DATA !== 'undefined' && window.GOLAZO_DATA;
+
+// Combos demo (se usan si data.js no existe o no trae combos)
+const COMBOS = [
+  {nombre:"Real Madrid gana", liga:"La Liga · 21:00", tipo:"Simple",
+   odds:2.10, prob:62.4, ev:11.4, conf:82, kellyPct:3.1,
+   picks:[{partido:"Real Madrid vs Barcelona", mercado:"1X2 Local", odds:2.10, prob:68, conf:82}],
+   chips:[{t:"5W racha RM",c:"acc"},{t:"Barça sin Pedri",c:"acc"}],
+   verdict:"Apostar"},
+  {nombre:"Arsenal BTTS + Over 2.5", liga:"Premier · 17:30", tipo:"Combo 2x",
+   odds:2.88, prob:48.1, ev:10.2, conf:74, kellyPct:2.2,
+   picks:[{partido:"Arsenal vs Man City", mercado:"BTTS Sí", odds:1.75, prob:68, conf:74},
+          {partido:"Arsenal vs Man City", mercado:"Over 2.5", odds:1.65, prob:71, conf:76}],
+   chips:[{t:"City rota",c:"acc"},{t:"Arsenal 4W",c:"acc"}], verdict:"Apostar"},
+  {nombre:"Leverkusen gana", liga:"Bundesliga · 15:30", tipo:"Simple",
+   odds:1.85, prob:65.0, ev:9.6, conf:71, kellyPct:1.9,
+   picks:[{partido:"Leverkusen vs Dortmund", mercado:"1X2 Local", odds:1.85, prob:65, conf:71}],
+   chips:[{t:"Leverkusen 6W",c:"acc"},{t:"Dortmund 3 bajas",c:"acc"}], verdict:"Apostar"},
+  {nombre:"PSG Over + Mbappé anota", liga:"Ligue 1 · 20:45", tipo:"Combo 2x",
+   odds:3.20, prob:42.1, ev:11.7, conf:66, kellyPct:1.7,
+   picks:[{partido:"PSG vs Lyon", mercado:"Over 2.5", odds:1.72, prob:69, conf:73},
+          {partido:"PSG vs Lyon", mercado:"Mbappé marca", odds:1.95, prob:61, conf:66}],
+   chips:[{t:"xG PSG 2.8",c:"acc"},{t:"Mbappé 8G/6 part.",c:"acc"}], verdict:"Apostar"},
+  {nombre:"Más de 4.5 córners RM", liga:"La Liga · 21:00", tipo:"Especial",
+   odds:1.62, prob:71.0, ev:11.5, conf:75, kellyPct:1.6,
+   picks:[{partido:"Real Madrid vs Barcelona", mercado:"+4.5 córners RM", odds:1.62, prob:71, conf:75}],
+   chips:[{t:"RM 6.8 córners/p",c:"acc"},{t:"Clásico = tensión",c:"acc"}], verdict:"Apostar"},
+  {nombre:"Triple Premium", liga:"Multi-liga", tipo:"Combo 3x",
+   odds:5.82, prob:26.8, ev:12.3, conf:64, kellyPct:0.9,
+   picks:[{partido:"Leverkusen vs Dortmund", mercado:"Local gana", odds:1.85, prob:65, conf:71},
+          {partido:"PSG vs Lyon", mercado:"Over 2.5", odds:1.72, prob:69, conf:73},
+          {partido:"Arsenal vs Man City", mercado:"BTTS Sí", odds:1.75, prob:68, conf:74}],
+   chips:[{t:"EV combinado alto",c:"acc"},{t:"3 partidos indep.",c:"acc"}], verdict:"Con cautela"},
+];
+
+const fCOP = n => '$' + Math.round(n).toLocaleString('es-CO');
+
+// Si data.js trae combos reales, reemplazar el array demo
+function cargarDatosReales() {
+  if (!HAS_REAL || !window.GOLAZO_DATA.combos || window.GOLAZO_DATA.combos.length === 0) return;
+  const reales = window.GOLAZO_DATA.combos.map(c => ({
+    nombre: c.nombre, liga: (c.picks[0]?.liga||'Multi-liga') + ' · ' + c.tipo, tipo: c.tipo,
+    odds: c.cuota, prob: c.prob_pct, ev: c.ev_pct, conf: c.confianza, kellyPct: c.kelly_pct,
+    picks: c.picks.map(p => ({partido: p.partido, mercado: p.mercado, odds: p.cuota, prob: p.prob, conf: p.conf, casa: p.casa})),
+    chips: [
+      ...(c.confianza>=80 ? [{t:'Alta confianza', c:'acc'}] : []),
+      ...(c.ev_pct>=10 ? [{t:'EV +'+c.ev_pct+'%', c:'acc'}] : []),
+      ...(c.kelly_pct>=5 ? [{t:'Kelly '+c.kelly_pct+'%', c:'acc'}] : [])
+    ],
+    verdict: c.ev_pct>=8 ? 'Apostar' : 'Con cautela'
+  }));
+  COMBOS.length = 0;
+  reales.forEach(c => COMBOS.push(c));
+  // Actualizar badge y banner
+  const m = window.GOLAZO_DATA.metricas || {};
+  const b = document.getElementById('modo-badge');
+  if (b) {
+    b.textContent = '● ' + (window.GOLAZO_DATA.modo_produccion?'Producción':'Sombra') + ' · ' + window.GOLAZO_DATA.ultima_actualizacion;
+  }
+  const banner = document.getElementById('demo-banner');
+  if (banner) {
+    banner.innerHTML = '<strong>Datos en vivo.</strong> Generados el ' + window.GOLAZO_DATA.ultima_actualizacion + '. Historial: ' + (m.total_combos||0) + ' combos, ' + (m.verificados||0) + ' verificados. ROI: ' + (m.roi_pct!==undefined?m.roi_pct:'—') + '%. Hit rate: ' + (m.hit_rate_pct!==undefined?m.hit_rate_pct:'—') + '%.';
+  }
+  // Fecha
+  if (window.GOLAZO_DATA.fecha_combos) {
+    const f = new Date(window.GOLAZO_DATA.fecha_combos + 'T00:00:00');
+    const ds = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    const ms = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    document.getElementById('fecha-hoy').textContent = ds[f.getDay()] + ' ' + f.getDate() + ' ' + ms[f.getMonth()];
+  }
+  // ROI en hero
+  const statEv = document.getElementById('stat-ev');
+  if (statEv && m.roi_pct !== undefined) {
+    statEv.textContent = (m.roi_pct>=0?'+':'') + m.roi_pct + '%';
+    statEv.style.color = m.roi_pct>=0 ? 'var(--acc)' : 'var(--text)';
+  }
+}
+
+function generarJustif(c) {
+  const partes = [];
+  if (c.ev >= 10) partes.push('EV de +' + c.ev + '% indica que la cuota está subvalorada');
+  if (c.conf >= 80) partes.push('Alta confianza (' + c.conf + '%) por consistencia entre xG y forma reciente');
+  if (c.prob >= 65) partes.push('Probabilidad real del ' + c.prob + '% supera la implícita en la cuota');
+  if (c.picks[0]?.casa) partes.push('Mejor cuota disponible en ' + c.picks[0].casa);
+  if (c.kellyPct >= 5) partes.push('Kelly recomienda ' + c.kellyPct + '% del bankroll, posición moderada-agresiva');
+  if (partes.length === 0) partes.push('EV positivo según el modelo, posición conservadora recomendada');
+  return partes.join('. ') + '.';
+}
+
+function llenarPickDestacado() {
+  if (COMBOS.length === 0) return;
+  const top = COMBOS.reduce((b, c) => c.ev > (b?.ev || -999) ? c : b, null);
+  document.getElementById('ph-title').textContent = top.nombre;
+  document.getElementById('ph-sub').textContent = top.liga;
+  document.getElementById('ph-cuota').textContent = '@' + top.odds;
+  document.getElementById('ph-ev').textContent = '+' + top.ev + '%';
+  document.getElementById('ph-conf').textContent = top.conf + '%';
+  // Calcular inversión basada en Kelly + bankroll por defecto
+  const inv = Math.max(1000, Math.round(200000 * (top.kellyPct/100) / 500) * 500);
+  document.getElementById('ph-inv').textContent = fCOP(inv);
+  document.getElementById('ph-just').textContent = generarJustif(top);
+}
+
+function llenarTelegram() {
+  if (!HAS_REAL || !window.GOLAZO_DATA.metricas) return;
+  const m = window.GOLAZO_DATA.metricas;
+  document.getElementById('tg-c').textContent = m.total_combos || 0;
+  document.getElementById('tg-h').textContent = (m.hit_rate_pct!==undefined ? m.hit_rate_pct : '—') + '%';
+  const roi = m.roi_pct!==undefined ? m.roi_pct : 0;
+  document.getElementById('tg-r').textContent = (roi>=0?'+':'') + roi + '%';
+  if (window.GOLAZO_DATA.bot_username) {
+    document.getElementById('btn-tg').href = 'https://t.me/' + window.GOLAZO_DATA.bot_username;
+  }
+}
+
+function recalc() {
+  const bank = +document.getElementById('sl-bank').value;
+  const risk = +document.getElementById('sl-risk').value / 100;
+  const minEV = +document.getElementById('sl-ev').value;
+  document.getElementById('out-bank').textContent = fCOP(bank);
+  document.getElementById('out-risk').textContent = (risk*100) + '%';
+  document.getElementById('out-ev').textContent = minEV + '%';
+  const maxRisk = bank * risk;
+  const activos = COMBOS.filter(c => c.ev >= minEV);
+  const totK = activos.reduce((s,c) => s + c.kellyPct/100, 0);
+  const scale = totK > 0 ? Math.min(1, maxRisk / (bank * totK)) : 1;
+  let tInv=0, tEv=0, tRet=0;
+  activos.forEach(c => {
+    const inv = Math.max(0, Math.round(bank * (c.kellyPct/100) * scale / 500) * 500);
+    c._inv = inv;
+    c._ret = Math.round(inv * c.odds);
+    c._evcop = Math.round(inv * (c.prob/100 * c.odds - 1));
+    tInv += inv; tEv += c._evcop; tRet += (c._ret - inv);
+  });
+  // KPIs
+  document.getElementById('kpi-strip').innerHTML = `
+    <div class="kpi-box"><div class="kpi-l">Combos activos</div><div class="kpi-v">${activos.length}</div><div class="kpi-s">de ${COMBOS.length}</div></div>
+    <div class="kpi-box"><div class="kpi-l">Total apostado</div><div class="kpi-v">${fCOP(tInv)}</div><div class="kpi-s">${(tInv/bank*100).toFixed(1)}% bankroll</div></div>
+    <div class="kpi-box"><div class="kpi-l">Ganancia esperada</div><div class="kpi-v acc">${fCOP(tEv)}</div><div class="kpi-s">EV del día</div></div>
+    <div class="kpi-box"><div class="kpi-l">Si ganan todos</div><div class="kpi-v acc">${fCOP(tRet)}</div><div class="kpi-s">Escenario óptimo</div></div>
+    <div class="kpi-box"><div class="kpi-l">Pérdida máxima</div><div class="kpi-v">-${fCOP(tInv)}</div><div class="kpi-s">Si todos fallan</div></div>`;
+  // Combos
+  document.getElementById('combos-grid').innerHTML = activos.map((c, i) => {
+    const picks = c.picks.map(p => `<tr><td>${p.partido}</td><td><span class="mkt-tag">${p.mercado}</span></td><td class="mono">@${p.odds}</td><td class="mono">${p.prob}%</td><td class="mono" style="color:var(--muted)">${p.conf}%</td></tr>`).join('');
+    const chips = c.chips.map(ch => `<span style="font-size:.72rem;padding:3px 10px;background:rgba(0,230,118,0.1);color:var(--acc);border:1px solid rgba(0,230,118,0.25);font-family:var(--font-m);margin-right:4px;display:inline-block;margin-bottom:4px">${ch.t}</span>`).join('');
+    return `
+    <div class="combo-card">
+      <div class="combo-head" onclick="tog('cb${i}','ch${i}')">
+        <div class="combo-num">${i+1}</div>
+        <div><div class="combo-title">${c.nombre}</div><div class="combo-liga">${c.liga}</div></div>
+        <span class="ev-pill">EV +${c.ev}%</span>
+        <div class="combo-odds mono">@${c.odds.toFixed(2)}</div>
+        <div class="combo-inv-v">${fCOP(c._inv)}</div>
+        <div class="combo-ret-v">→ ${fCOP(c._ret)}</div>
+        <span class="chev${i===0?' open':''}" id="ch${i}">▾</span>
+      </div>
+      <div class="combo-body" id="cb${i}" style="display:${i===0?'block':'none'}">
+        <div class="justif-box"><div class="lbl">▸ Justificación del pick</div>${generarJustif(c)}</div>
+        <table class="picks-tbl">
+          <thead><tr><th>Partido</th><th>Mercado</th><th>Cuota</th><th>Prob.</th><th>Conf.</th></tr></thead>
+          <tbody>${picks}</tbody>
+        </table>
+        <div style="margin-bottom:1rem">${chips}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-top:.75rem;border-top:1px solid rgba(240,244,248,0.05);flex-wrap:wrap;gap:1rem">
+          <span class="mono" style="font-size:.78rem;color:var(--muted)">Inversión: ${fCOP(c._inv)} · Kelly: ${c.kellyPct}% · Retorno: ${fCOP(c._ret)}</span>
+          <span class="mono" style="font-size:.78rem;color:var(--acc)">▸ ${c.verdict}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  // Distribución
+  const maxInv = Math.max(...activos.map(c => c._inv), 1);
+  document.getElementById('dist-bars').innerHTML = activos.map((c, i) => {
+    const w = Math.round(c._inv / maxInv * 100);
+    return `<div class="dist-row">
+      <div class="dist-lbl">${i+1}. ${c.nombre.substring(0,28)}${c.nombre.length>28?'…':''}</div>
+      <div class="dist-bar"><div class="dist-fill" style="width:${w}%">${fCOP(c._inv)}</div></div>
+      <div class="dist-ret mono">→ ${fCOP(c._ret)}</div>
+    </div>`;
+  }).join('');
+}
+
+function tog(id, chId) {
+  const el = document.getElementById(id);
+  const ch = document.getElementById(chId);
+  const o = el.style.display === 'block';
+  el.style.display = o ? 'none' : 'block';
+  if (ch) ch.classList.toggle('open', !o);
+}
+
+function renderRoiChart() {
+  if (!HAS_REAL || !window.GOLAZO_DATA.historial_reciente) return;
+  const hist = window.GOLAZO_DATA.historial_reciente.filter(h => h.resultado);
+  if (hist.length < 2) return;
+  let acum = 0;
+  const pts = hist.map((h, i) => { acum += ((h.retorno||0) - (h.inversion||0)); return {x:i, y:acum}; });
+  const minY = Math.min(0, ...pts.map(p=>p.y)), maxY = Math.max(0, ...pts.map(p=>p.y));
+  const rY = (maxY - minY) || 1;
+  const w=800, h=240, pX=60, pY=30;
+  const sx = i => pX + (i/Math.max(1,pts.length-1)) * (w-pX*2);
+  const sy = v => h - pY - ((v-minY)/rY) * (h-pY*2);
+  const path = pts.map((p,i) => (i?'L':'M')+sx(i)+','+sy(p.y)).join(' ');
+  const area = path + ' L'+sx(pts.length-1)+','+sy(0)+' L'+sx(0)+','+sy(0)+' Z';
+  const ult = pts[pts.length-1].y;
+  const grids = []; for(let g=0; g<=4; g++) {
+    const v = minY + rY*g/4; const py = sy(v);
+    grids.push(`<line x1="${pX}" y1="${py}" x2="${w-pX}" y2="${py}" stroke="rgba(255,255,255,0.05)"/>`);
+    grids.push(`<text x="${pX-8}" y="${py+4}" fill="#8A9BB0" font-family="DM Mono" font-size="10" text-anchor="end">${fCOP(v)}</text>`);
+  }
+  const sec = document.createElement('section');
+  sec.className = 'roi-section';
+  sec.innerHTML = `<div class="container">
+    <div class="label">Evolución del ROI</div>
+    <h2>Tu balance acumulado.</h2>
+    <p style="color:var(--muted);max-width:550px;margin-top:.75rem">Cada punto es un pick verificado. La línea es ganancia/pérdida acumulada en pesos.</p>
+    <div class="roi-wrap">
+      <svg class="roi-chart-svg" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+        ${grids.join('')}
+        <line x1="${pX}" y1="${sy(0)}" x2="${w-pX}" y2="${sy(0)}" stroke="#8A9BB0" stroke-dasharray="3,3" opacity="0.4"/>
+        <path d="${area}" fill="var(--acc)" opacity="0.12"/>
+        <path d="${path}" fill="none" stroke="var(--acc)" stroke-width="2"/>
+        ${pts.map((p,i)=>'<circle cx="'+sx(i)+'" cy="'+sy(p.y)+'" r="3" fill="var(--acc)"/>').join('')}
+      </svg>
+      <div class="roi-legend">
+        <span><span class="roi-dot"></span>Balance acumulado</span>
+        <span>Total picks: ${pts.length}</span>
+        <span>Balance final: <strong style="color:var(--acc)">${fCOP(ult)}</strong></span>
+      </div>
+    </div></div>`;
+  const cta = document.querySelector('.cta-section');
+  if (cta) cta.parentNode.insertBefore(sec, cta);
+}
+
+// ─── INIT ───
+cargarDatosReales();
+const ds = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+const ms = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const fh = document.getElementById('fecha-hoy');
+if (fh && !fh.textContent) {
+  const h = new Date();
+  fh.textContent = ds[h.getDay()] + ' ' + h.getDate() + ' ' + ms[h.getMonth()];
+}
+recalc();
+llenarPickDestacado();
+llenarTelegram();
+renderRoiChart();
+</script>
+</body>
+</html>
+   
